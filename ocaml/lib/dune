@@ -1,2 +1,16 @@
 (library
- (name ocaml))
+ (name ocaml_chord)
+ (libraries lwt.unix capnp-rpc-lwt capnp-rpc-net capnp-rpc-unix)
+ (modules chord node)
+)
+
+(executable
+ (name location_service)
+ (libraries ocaml_chord)
+ (modules location_service)
+)
+
+(rule
+ (targets chord_api.ml chord_api.mli)
+ (deps    chord_api.capnp)
+ (action (run capnp compile -o %{bin:capnpc-ocaml} %{deps})))

@@ -1,49 +1,37 @@
+open Lwt.Infix
+open Capnp_rpc_lwt
+open Capnp_rpc_net
+open Capnp_rpc_unix
 open Hashtbl
 
-let generate_random_ip_address () =
-  let random_octet () = Random.int 256 in
-  let ip_parts = List.init 4 (fun _ -> random_octet ()) in
-  let ip_str = String.concat "." (List.map string_of_int ip_parts) in
-  Unix.inet_addr_of_string ip_str
+module Restorer = Capnp_rpc_net.Restorer
 
-let init () =
-  let node_id = generate_random_ip_address in
-  let finger_table = Hashtbl.create 100;
+module ChordNodeImpl = struct
+  type t = {
+    id: string;
+    address: string;
+    uri: string;
+  }
 
-let create () =
-  (* predecessor nil *)
-  (* successor n *)
+  type config = {
+    host : string;
+    port : int;
+  }
 
-let join chord_node = 
-  (* predecessor nil *)
-  (* succesor n' find successor n *)
+  let cap_file = "chord.cap"  
 
-(* background thread *)
-let stabilize () =
-  (*
-  x = successor.predecessor
-  if x in (n, successor): successor = x
-  successor = notify(n)
-  *)
+  let serve config =
+    Lwt_main.run begin
+      let service_id = Capnp_rpc_unix.Vat_config.derived_id config "main" in
+      let restore = Restorer.single service_id Chord.local in
+      Capnp_rpc_unix.serve config ~restore >>= fun vat ->
+      match Capnp_rpc_unix.Cap_file.save_service vat service_id cap_file with
+      | Error `Msg m -> failwith m
+      | Ok () ->
+        Fmt.pr "Server running. Connect using %S.@." cap_file;
+        fst @@ Lwt.wait ()
+    end
 
-let notify chord_node =
-  (*
-  if predecessor is nil or chord_node in (predecessor, n):
-    predecessor = chord_node
-  *)
-
-(* background thread *)
-let fix_fingers () = 
-  (*
-  next += 1
-  if (next > m): next = 1;
-  finger[next] = find_successor(n + 2 ^ ext - 1)
-  *)
-
-(* background thread *)
-let check_predecessor () =
-  (*
-  if predecessor failed:
-    predecessor = nil
-
-  *)
+  let init config =
+    serve config;;
+end
