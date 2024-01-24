@@ -1,18 +1,32 @@
 #ifndef _CHORD_H
 #define _CHORD_H
 
-class ChordNode{
-	ChordNode find_successor(id);
-	ChordNode find_predecessor(id);
-	ChordNode closest_preceding_finger(id);
+#include "string"
+#include <vector>
 
-	ChordNode successor;
-	ChordNode predecessor;
+class ChordNode {
+public:
+	ChordNode(const std::string& identifier) : identifier(identifier) { }
+	virtual ~ChordNode() = default;
+
+	virtual ChordNode* find_successor(std::string id) = 0;
+	virtual ChordNode* find_predecessor(std::string id) = 0;
+	virtual ChordNode* closest_preceding_finger(std::string id) = 0;
+
+	ChordNode* successor;
+	ChordNode* predecessor;
+
+	std::string get_identifier() const {
+        return identifier;
+    }
+
+    ChordNode* get_finger_table(int idx){
+    	return this->finger_table[idx];
+    }
+
 private:
-	// 48 bits for IPv4 (32 bits) + port (16 bits)
-	// 144 bits for IPv6 (128 bits) + port (16 bits)
-	string ipaddr;
-	vector<ChordNode>finger_table;
-}
+	std::string identifier;
+	std::vector<ChordNode*>finger_table;
+};
 
 #endif
