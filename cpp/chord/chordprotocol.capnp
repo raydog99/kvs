@@ -1,5 +1,6 @@
 struct NodeInfo {
 	id @0: Text;
+	ipAddress @0: Text;
 }
 
 interface ChordNode{
@@ -9,7 +10,5 @@ interface ChordNode{
 
 	closest_preceding_finger @2 (key : Text) -> (result : NodeInfo);
 
-	join @3 (nodeInfo : NodeInfo) -> ();
-
-	init_finger_table @4 () -> ();
+	get_successor @5 () -> (result : NodeInfo);
 }
