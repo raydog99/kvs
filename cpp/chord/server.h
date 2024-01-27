@@ -5,23 +5,22 @@
 #include <string>
 #include <stdio.h>
 
-class Server : ChordNode{
+class ChordNodeImpl final: public ChordNode::Server {
 public:
-	Server(const std::string& ip);
-    virtual ~Server() override;
+    explicit ChordNodeImpl(const std::string& nodeId);
+    kj::Promise<NodeInfo::Reader> findSuccessor(FindSuccessorContext context) override;
+    kj::Promise<NodeInfo::Reader> findPredecessor(FindPredecessorContext context) override;
+    kj::Promise<NodeInfo::Reader> closestPrecedingFinger(ClosestPrecedingFingerContext context) override;
+    void join(NodeInfo node) override;
+    void initFingerTable(InitFingerTableContext context) override;
 
-    ChordNode* find_successor(std::string id) override;
-    ChordNode* find_predecessor(std::string id) override;
-    ChordNode* closest_preceding_finger(std::string id) override;
+    NodeInfo getSuccessor();
+    NodeInfo getPredecessor();
 private:
-	std::string ipAddr;
-};
-
-
-
-
-
-
-
+	NodeInfo nodeInfo;
+	std::string ipAddress;
+	std::string identifier;
+	vector<NodeInfo::Reader> fingerTable;
+}
 
 #endif
