@@ -6,8 +6,10 @@ set(CMAKE_CXX_STANDARD 14)
 # Add the source files for the chord library
 set(CHORD_SRC
     chord.h
-    server.cpp
     server.h
+    server.cpp
+    finger_table.h
+    finger_table.cpp
 )
 
 # Create the chord library
