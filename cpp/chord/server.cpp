@@ -1,4 +1,5 @@
 #include "server.h"
+#include "helper_functions.h"
 #include <capnp/ez-rpc.h>
 #include <ChordProtocol.capnp.h>
 #include <iostream>
@@ -29,6 +30,24 @@ kj::Promise<NodeInfo> ChordNodeImpl::findSuccessor(FindSuccessorContext params) 
     std::cout << "PASS" << std::endl;
 }
 
+kj::Promise<NodeInfo> ChordNodeImpl::findPredecessor(const std::string& id) {
+    NodeInfo currentNode = *this;
+
+    NodeInfo closestPredecessor = currentNode;
+
+    while (!is_in_interval(id, closestPredecessor.getId(), closestPredecessor.getSuccessor(), true, false)) {
+        auto request = currentNode.find_closest_preceding_finger_request();
+        request.setParams(id);
+
+        auto responsePromise = request.send().get_result();
+        auto response = responsePromise.wait(client.getWaitScope());
+
+        closestPredecessor = response.getClosestPrecedingFinger();
+    }
+
+    return closestPredecessor;
+}
+
 kj::Promise<void> ChordNodeImpl::join(){
     for (int i = 0; i < m; i++){
         finger_table[i] = nodeInfo;
@@ -53,7 +72,7 @@ void ChordNodeImpl::initFingerTable(NodeInfo node){
     std::cout << "Initializing finger table...";
     std::cout.flush();
 
-    auto successor_request = find_successor(finger[i].start);
+    auto successor_request = findSuccessor(finger[i].start);
 
     return successor_request.then([this, i, myNodeId](NodeInfo successor) mutable {
         fingerTable[i + 1] = successor;
