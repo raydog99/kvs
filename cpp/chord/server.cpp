@@ -7,9 +7,7 @@
 ChordNodeImpl::ChordNodeImpl(const std::string& ipAddress) : ipAddress(ipAddress), identifier(ipAddress) { }
 
 kj::Promise<NodeInfo> ChordNodeImpl::findSuccessor(FindSuccessorContext params) {
-    Text key = params.getKey();
-
-    auto identifier = params.getParams()
+    auto identifier = params.getParams();
 
     capnp::EzRpcClient client(ipAddress);
     ChordProtocol::Client chord_client = client.getMain<ChordProtocol>();
@@ -46,6 +44,18 @@ kj::Promise<NodeInfo> ChordNodeImpl::findPredecessor(const std::string& id) {
     }
 
     return closestPredecessor;
+}
+
+kj::Promise<NodeInfo> ChordNodeImpl::closestPrecedingFinger(const std::string& id) {
+    auto identifier = params.getParams();
+    NodeInfo n = *this;
+
+    for (int i = m - 1; i > 0; i--){
+        if (is_in_interval(finger_table[i].getId(), n.getId(), identifier)){
+            return finger_table[i].nodeInfo;
+        }
+    }
+    return n;
 }
 
 kj::Promise<void> ChordNodeImpl::join(){
@@ -106,8 +116,11 @@ kj::Promise<void> ChordNodeImpl::updateOthers(){
     }
 }
 
-kj::Promise<void> ChordNodeImpl::updateFingerTable(){
-    if (true){
+kj::Promise<void> ChordNodeImpl::updateFingerTable(UpdateFingerContext params){
+    std::string sIdentifier = params.getParams();
+    NodeInfo n = *this;
+
+    if (is_in_interval(sIdentifier, n.getId(), fingerTable[fingerIdx].getId())){
         finger[i].node = s;
         p = predecessor;
         p.update_finger_table(s, i);
