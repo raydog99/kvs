@@ -10,5 +10,7 @@ interface ChordNode{
 
 	closest_preceding_finger @2 (key : Text) -> (result : NodeInfo);
 
-	get_successor @5 () -> (result : NodeInfo);
+	update_finger_table @3 (node : NodeInfo, fingerIndex : Int64) -> (result: NodeInfo);
+
+	get_successor @4 () -> (result : NodeInfo);
 }
