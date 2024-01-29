@@ -11,6 +11,7 @@ public:
     kj::Promise<NodeInfo::Reader> findSuccessor(FindSuccessorContext context) override;
     kj::Promise<NodeInfo::Reader> findPredecessor(FindPredecessorContext context) override;
     kj::Promise<NodeInfo::Reader> closestPrecedingFinger(ClosestPrecedingFingerContext context) override;
+    kj::Promise<NodeInfo::Reader> updateFingerTable(UpdateFingerTableContext context) override;
     void join(NodeInfo node) override;
     void initFingerTable(InitFingerTableContext context) override;
 
