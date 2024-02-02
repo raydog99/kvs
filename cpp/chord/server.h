@@ -1,17 +1,17 @@
 #ifndef _SERVER_H
 #define _SERVER_H
 
-#include "chord.h"
 #include <string>
+#include "ChordProtocol.capnp.h"
 #include <stdio.h>
 
 class ChordNodeImpl final: public ChordNode::Server {
 public:
     explicit ChordNodeImpl(const std::string& nodeId);
-    kj::Promise<NodeInfo::Reader> findSuccessor(FindSuccessorContext context) override;
-    kj::Promise<NodeInfo::Reader> findPredecessor(FindPredecessorContext context) override;
-    kj::Promise<NodeInfo::Reader> closestPrecedingFinger(ClosestPrecedingFingerContext context) override;
-    kj::Promise<NodeInfo::Reader> updateFingerTable(UpdateFingerTableContext context) override;
+    kj::Promise<void> findSuccessor(FindSuccessorContext context) override;
+    kj::Promise<void> findPredecessor(FindPredecessorContext context) override;
+    kj::Promise<void> closestPrecedingFinger(ClosestPrecedingFingerContext context) override;
+    kj::Promise<void> updateFingerTable(UpdateFingerTableContext context) override;
     void join(NodeInfo node) override;
     void initFingerTable(InitFingerTableContext context) override;
 
