@@ -1,7 +1,7 @@
 #include "server.h"
 #include "helper_functions.h"
-#include <capnp/ez-rpc.h>
-#include <ChordProtocol.capnp.h>
+#include "ChordProtocol.capnp.h"
+#include <capnp/message.h>
 #include <iostream>
 
 ChordNodeImpl::ChordNodeImpl(const std::string& ipAddress) : ipAddress(ipAddress), identifier(ipAddress) { }
