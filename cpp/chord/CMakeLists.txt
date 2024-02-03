@@ -6,8 +6,6 @@ set(CMAKE_CXX_STANDARD 14)
 set(CHORD_SRC
     server.h
     server.cpp
-    finger_table.h
-    finger_table.cpp
 )
 
 # Find Cap'n Proto package
@@ -17,10 +15,10 @@ find_package(CapnProto REQUIRED)
 capnp_generate_cpp(CAPNP_SOURCES CAPNP_HEADERS ChordProtocol.capnp)
 
 # Create the chord library
-add_library(chord ${CHORD_SRC} ${CAPNP_SOURCES} ${CAPNP_HEADERS})
+add_library(chord ${CHORD_SRC} ${CAPNP_SOURCES})
 
 # Link against Cap'n Proto library
-target_link_libraries(chord PRIVATE CapnProto::capnp-rpc kj kj-http)
+target_link_libraries(chord PRIVATE utils_library CapnProto::capnp-rpc)
 
 # Include the headers from the chord library
 target_include_directories(chord PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
