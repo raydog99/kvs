@@ -1,18 +1,15 @@
 @0xf3b660d9f4459d91;
 
-struct NodeInfo {
-	id @0: Text;
-	ipAddress @1: Text;
-}
-
 interface ChordNode{
-	findSuccessor @0 (key : Text) -> (result : NodeInfo);
+	findSuccessor @0 (key :Text) -> (result :ChordNode);
+	findPredecessor @1 (key :Text) -> (result :ChordNode);
+	closestPrecedingFinger @2 (key :Text) -> (result :ChordNode);
 
-	findPredecessor @1 (key : Text) -> (result : NodeInfo);
+	join @3 (node :ChordNode) -> ();
+	notify @4 (node :ChordNode) -> ();
 
-	closestPrecedingFinger @2 (key : Text) -> (result : NodeInfo);
-
-	updateFingerTable @3 (node : NodeInfo, fingerIndex : Int64) -> (result: NodeInfo);
-
-	getSuccessor @4 () -> (result : NodeInfo);
+	getSuccessor @5 () -> (result :ChordNode);
+	getPredecessor @6 () -> (result :ChordNode);
+	inRange @7 (key :Text, previousNodeIdentifier :Text, leftInclusive :Bool, rightInclusive :Bool) -> (result :Bool);
+	getIdentifier @8 () -> (result :Text);
 }
