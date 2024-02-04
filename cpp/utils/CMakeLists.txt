@@ -1,5 +1,6 @@
 set(UTILS_SOURCES
-    helper_functions.cpp
+	helperFunctions.h
+    helperFunctions.cpp
 )
 
 add_library(utils_library ${UTILS_SOURCES})
