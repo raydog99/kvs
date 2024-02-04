@@ -2,7 +2,8 @@
 #define _SERVER_H
 
 #include "ChordProtocol.capnp.h"
-#include "helper_functions.h"
+#include "fingerTable.h"
+#include "helperFunctions.h"
 
 #include <string>
 #include <stdio.h>
@@ -17,6 +18,8 @@
 #include <kj/compat/gtest.h>
 #include <kj/async-io.h>
 
+struct FingerTable;
+
 class ChordNodeImpl final: public ChordNode::Server {
 public:
     ChordNodeImpl(std::string ipAddress);
@@ -28,21 +31,19 @@ public:
     kj::Promise<void> join(JoinContext context) override;
     kj::Promise<void> notify(NotifyContext context) override;
 
-    void stabilize();
-    void fixFingers();
-
     kj::Promise<void> getSuccessor(GetSuccessorContext context) override;
     kj::Promise<void> getPredecessor(GetPredecessorContext context) override;
     kj::Promise<void> inRange(InRangeContext context) override;
     kj::Promise<void> getIdentifier(GetIdentifierContext context) override;
 private:
+    void stabilize();
+    void fixFingers();
+
     std::string ipAddress;
     std::string identifier;
-    int fingerTableSize;
-	
-	std::vector<ChordNodeImpl*> fingerTable;
-	ChordNodeImpl* successor;
-	ChordNodeImpl* predecessor;
+
+    FingerTable *fingerTable;
+	ChordNode::Client predecessor;
 };
 
 #endif
