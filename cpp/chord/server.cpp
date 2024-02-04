@@ -1,17 +1,84 @@
 #include "server.h"
 
-ChordNodeImpl::ChordNodeImpl(std::string ipAddress) {
+ChordNodeImpl::ChordNodeImpl(std::string ipAddress) : fingerTable(), predecessor(this->thisCap()) {
     this->ipAddress = ipAddress;
     this->identifier = ipAddress; // (!)
-    this->fingerTableSize = 32;
 
-    this->successor = this;
-    this->predecessor = this;
-
-    for (int i = 0; i < this->fingerTableSize; i++){
-        fingerTable.push_back(this);
-    }
+    stabilize();    // run every 30s
 }
+
+void ChordNodeImpl::stabilize() {
+    auto successor = this->fingerTable->getSuccessor();
+
+    auto io = kj::setupAsyncIo();
+    auto newSuccessorPromise = successor.getPredecessorRequest().send().wait(io.waitScope);
+
+    auto newSuccessor = newSuccessorPromise.getPredecessor();
+    auto newSuccessorIdentifier = newSuccessorPromise.getPredecessor().getIdentifierRequest().send().wait(io.waitScope).getIdentifier();
+
+    Interval newSuccessorRange = Interval(
+        this->identifier,
+        newSuccessorIdentifier,
+        false,
+        false
+        );
+
+    bool foundNewSuccessor = newSuccessorRange.inRange(newSuccessorIdentifier);
+    if (foundNewSuccessor == true){
+        this->fingerTable->nodes[1] = this->thisCap();
+    }
+
+    auto nodeServer = kj::heap<ChordNodeImpl>(this->ipAddress);
+    ChordNode::Client nodeCapability = kj::mv(nodeServer);
+
+    auto notifyPromise = successor.notifyRequest();
+    notifyPromise.setNode(nodeCapability);
+    notifyPromise.send().wait(io.waitScope);
+}
+
+kj::Promise<void> ChordNodeImpl::notify(NotifyContext context){
+    std::cout << "Notify called...";
+    std::cout.flush();
+
+    auto node = context.getParams().getNode();
+
+    auto io = kj::setupAsyncIo();
+    std::string nodeIdentifier = node.getIdentifierRequest().send().wait(io.waitScope).getIdentifier();
+
+    std::string predecessorIdentifier = this->predecessor.getIdentifierRequest().send().wait(io.waitScope).getIdentifier();
+
+    Interval predecessorRange = Interval(
+        predecessorIdentifier,
+        this->identifier,
+        false,
+        false
+        );
+
+    bool predecessorIsNull = false;     // call to check if predecessor is alive
+    bool nodeIsPredecessor = predecessorRange.inRange(nodeIdentifier);
+
+    if (predecessorIsNull == true || nodeIsPredecessor == true){
+        this->predecessor = node;
+    }
+
+    return kj::READY_NOW;
+}
+
+
+void ChordNodeImpl::fixFingers() {
+    auto randomIndex = 0; // [0, m-1]
+
+    auto io = kj::setupAsyncIo();
+    auto server = kj::heap<ChordNodeImpl>(this->ipAddress);
+    ChordNode::Client capability = kj::mv(server);
+
+    auto indexSuccessorRequest = capability.findSuccessorRequest();
+    indexSuccessorRequest.setKey(this->fingerTable->getStart(randomIndex));
+    auto indexSuccessor = indexSuccessorRequest.send().wait(io.waitScope).getSuccessor();
+
+    this->fingerTable->nodes[randomIndex] = indexSuccessor;
+}
+
 
 kj::Promise<void> ChordNodeImpl::findSuccessor(FindSuccessorContext context) {
     std::cout << "Finding successor...";
@@ -27,8 +94,8 @@ kj::Promise<void> ChordNodeImpl::findSuccessor(FindSuccessorContext context) {
     predecessorRequest.setKey(key);
     auto predecessor = predecessorRequest.send().wait(io.waitScope);
 
-    auto successor = predecessor.getResult().getSuccessorRequest().send().wait(io.waitScope).getResult();
-    context.getResults().setResult(successor);
+    auto successor = predecessor.getPredecessor().getSuccessorRequest().send().wait(io.waitScope).getSuccessor();
+    context.getResults().setSuccessor(successor);
 
     return kj::READY_NOW;
 }
@@ -47,10 +114,14 @@ kj::Promise<void> ChordNodeImpl::findPredecessor(FindPredecessorContext context)
 
         auto closestPrecedingFingerRequest = capability.closestPrecedingFingerRequest();
         closestPrecedingFingerRequest.setKey(key);
-        auto node = closestPrecedingFingerRequest.send().wait(io.waitScope);
-        auto nodeIdentifier = node.getResult().getIdentifierRequest().send().wait(io.waitScope).getResult();
+        auto node = closestPrecedingFingerRequest.send().wait(io.waitScope).getClosestPrecedingNode();
+        auto nodeIdentifier = node
+            .getIdentifierRequest()
+            .send()
+            .wait(io.waitScope)
+            .getIdentifier();
 
-        auto nodeInRangeRequest = node.getResult().inRangeRequest();
+        auto nodeInRangeRequest = node.inRangeRequest();
         nodeInRangeRequest.setKey(key);
         nodeInRangeRequest.setPreviousNodeIdentifier(nodeIdentifier);
         nodeInRangeRequest.setLeftInclusive(false);
@@ -58,7 +129,7 @@ kj::Promise<void> ChordNodeImpl::findPredecessor(FindPredecessorContext context)
 
         auto nodeInRange = nodeInRangeRequest.send().wait(io.waitScope).getResult();
         if (nodeInRange){
-            context.getResults().setResult(node.getResult());
+            context.getResults().setPredecessor(node);
         }
         return kj::READY_NOW;
     }
@@ -70,26 +141,26 @@ kj::Promise<void> ChordNodeImpl::closestPrecedingFinger(ClosestPrecedingFingerCo
 
     auto key = context.getParams().getKey();
 
-    for (int i = this->fingerTableSize - 1; i > 0; i--){
+    for (int i = this->fingerTable->fingerTableSize - 1; i > 0; i--){
         auto io = kj::setupAsyncIo();
-        auto server = kj::heap<ChordNodeImpl>(this->fingerTable[i]->ipAddress);
-        ChordNode::Client capability = kj::mv(server);
 
-        auto nodeIdentifier = capability.getIdentifierRequest().send().wait(io.waitScope).getResult();
+        auto nodeIdentifier = this->fingerTable->nodes[i].getIdentifierRequest().send().wait(io.waitScope).getIdentifier();
 
-        bool isClosestPrecedingFinger = is_in_interval(nodeIdentifier, this->identifier, key, false, false);
+        Interval closestPrecedingRange = Interval(
+            this->identifier,
+            key,
+            false,
+            false
+            );
+
+        bool isClosestPrecedingFinger = closestPrecedingRange.inRange(key);
         if(isClosestPrecedingFinger){
-
-            auto closestPrecedingServer = kj::heap<ChordNodeImpl>(fingerTable[i]->ipAddress);
-            ChordNode::Client closestPrecedingCapability = kj::mv(closestPrecedingServer);
-            context.getResults().setResult(closestPrecedingCapability);
+            context.getResults().setClosestPrecedingNode(this->fingerTable->nodes[i]);
             return kj::READY_NOW;
         }
     }
 
-    auto closestPrecedingServer = kj::heap<ChordNodeImpl>(this->ipAddress);
-    ChordNode::Client closestPrecedingCapability = kj::mv(closestPrecedingServer);
-    context.getResults().setResult(closestPrecedingCapability);
+    context.getResults().setClosestPrecedingNode(this->thisCap());
     return kj::READY_NOW;
 }
 
@@ -104,34 +175,18 @@ kj::Promise<void> ChordNodeImpl::join(JoinContext context){
     auto io = kj::setupAsyncIo();
     auto successorRequest = node.findSuccessorRequest();
     successorRequest.setKey(this->identifier);
-    auto successor = successorRequest.send().wait(io.waitScope);
+    auto successor = successorRequest.send().wait(io.waitScope).getSuccessor();
 
-    this->successor = successor.getResult();
-
-    return kj::READY_NOW;
-}
-
-
-kj::Promise<void> ChordNodeImpl::notify(NotifyContext context){
-    std::cout << "Joining...";
-    std::cout.flush();
+    this->fingerTable->nodes[1] = successor;
 
     return kj::READY_NOW;
 }
-
-void stabilize() { }
-
-void fixFingers() { }
-
 
 kj::Promise<void> ChordNodeImpl::getSuccessor(GetSuccessorContext context){
     std::cout << "Getting successor...";
     std::cout.flush();
 
-    // Keep a copy of client to ensure non-zero ref count?
-    auto server = kj::heap<ChordNodeImpl>(this->successor->ipAddress);
-    ChordNode::Client capability = kj::mv(server);
-    context.getResults().setResult(capability);
+    context.getResults().setSuccessor(this->fingerTable->getSuccessor());
 
     return kj::READY_NOW;
 }
@@ -140,13 +195,12 @@ kj::Promise<void> ChordNodeImpl::getPredecessor(GetPredecessorContext context){
     std::cout << "Getting predecessor...";
     std::cout.flush();
 
-    auto server = kj::heap<ChordNodeImpl>(this->predecessor->ipAddress);
-    ChordNode::Client capability = kj::mv(server);
-    context.getResults().setResult(capability);
+    context.getResults().setPredecessor(this->predecessor);
 
     return kj::READY_NOW;
 }
 
+// scrap, redundant (remote call to getIdentifier, check result)
 kj::Promise<void> ChordNodeImpl::inRange(InRangeContext context){
     std::cout << "Checking in range...";
     std::cout.flush();
@@ -156,9 +210,15 @@ kj::Promise<void> ChordNodeImpl::inRange(InRangeContext context){
     auto leftInclusive = context.getParams().getLeftInclusive();
     auto rightInclusive = context.getParams().getRightInclusive();
 
-    bool isInRange = is_in_interval(key, previousNodeIdentifier, this->identifier, leftInclusive, rightInclusive);
+    Interval intervalRange(
+        key,
+        previousNodeIdentifier,
+        leftInclusive,
+        rightInclusive
+        );
 
-    context.getResults().setResult(isInRange);
+    bool inRange = intervalRange.inRange(key);
+    context.getResults().setResult(inRange);
 
     return kj::READY_NOW;
 }
@@ -167,7 +227,7 @@ kj::Promise<void> ChordNodeImpl::getIdentifier(GetIdentifierContext context){
     std::cout << "Getting identifier...";
     std::cout.flush();
 
-    context.getResults().setResult(this->identifier);
+    context.getResults().setIdentifier(this->identifier);
 
     return kj::READY_NOW;
 }
