@@ -6,9 +6,11 @@ set(CMAKE_CXX_STANDARD 14)
 set(CHORD_SRC
     server.h
     server.cpp
+    fingerTable.h
+    fingerTable.cpp
 )
 
-# Find Cap'n Proto package
+# Find Cap'n Proto find_package
 find_package(CapnProto REQUIRED)
 
 # Generate C++ code from Cap'n Proto schema
