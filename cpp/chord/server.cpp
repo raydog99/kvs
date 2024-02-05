@@ -106,29 +106,30 @@ kj::Promise<void> ChordNodeImpl::findPredecessor(FindPredecessorContext context)
 
     auto key = context.getParams().getKey();
 
-    auto node = this;
+    auto node = this->thisCap();
+
     while(true){
         auto io = kj::setupAsyncIo();
-        auto server = kj::heap<ChordNodeImpl>(node->ipAddress);
-        ChordNode::Client capability = kj::mv(server);
 
-        auto closestPrecedingFingerRequest = capability.closestPrecedingFingerRequest();
-        closestPrecedingFingerRequest.setKey(key);
-        auto node = closestPrecedingFingerRequest.send().wait(io.waitScope).getClosestPrecedingNode();
-        auto nodeIdentifier = node
+        std::string nodeIdentifier = node.getIdentifierRequest().send().wait(io.waitScope).getIdentifier();
+        std::string nodeSuccessorIdentifier = node
+            .getSuccessorRequest()
+            .send()
+            .wait(io.waitScope)
+            .getSuccessor()
             .getIdentifierRequest()
             .send()
             .wait(io.waitScope)
             .getIdentifier();
 
-        auto nodeInRangeRequest = node.inRangeRequest();
-        nodeInRangeRequest.setKey(key);
-        nodeInRangeRequest.setPreviousNodeIdentifier(nodeIdentifier);
-        nodeInRangeRequest.setLeftInclusive(false);
-        nodeInRangeRequest.setRightInclusive(true);
-
-        auto nodeInRange = nodeInRangeRequest.send().wait(io.waitScope).getResult();
-        if (nodeInRange){
+        Interval predecessorRange = Interval(
+            nodeIdentifier,
+            nodeSuccessorIdentifier,
+            false,
+            true
+            );
+        bool predecessorFound = predecessorRange.inRange(key);
+        if (predecessorFound){
             context.getResults().setPredecessor(node);
         }
         return kj::READY_NOW;
@@ -196,29 +197,6 @@ kj::Promise<void> ChordNodeImpl::getPredecessor(GetPredecessorContext context){
     std::cout.flush();
 
     context.getResults().setPredecessor(this->predecessor);
-
-    return kj::READY_NOW;
-}
-
-// scrap, redundant (remote call to getIdentifier, check result)
-kj::Promise<void> ChordNodeImpl::inRange(InRangeContext context){
-    std::cout << "Checking in range...";
-    std::cout.flush();
-
-    auto key = context.getParams().getKey();
-    auto previousNodeIdentifier = context.getParams().getPreviousNodeIdentifier();
-    auto leftInclusive = context.getParams().getLeftInclusive();
-    auto rightInclusive = context.getParams().getRightInclusive();
-
-    Interval intervalRange(
-        key,
-        previousNodeIdentifier,
-        leftInclusive,
-        rightInclusive
-        );
-
-    bool inRange = intervalRange.inRange(key);
-    context.getResults().setResult(inRange);
 
     return kj::READY_NOW;
 }

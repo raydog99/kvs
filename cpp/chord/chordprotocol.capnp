@@ -10,7 +10,5 @@ interface ChordNode{
 
 	getSuccessor @5 () -> (successor :ChordNode);
 	getPredecessor @6 () -> (predecessor :ChordNode);
-
-	inRange @7 (key :Text, previousNodeIdentifier :Text, leftInclusive :Bool, rightInclusive :Bool) -> (result :Bool);
-	getIdentifier @8 () -> (identifier :Text);
+	getIdentifier @7 () -> (identifier :Text);
 }

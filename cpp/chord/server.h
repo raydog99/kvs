@@ -33,7 +33,6 @@ public:
 
     kj::Promise<void> getSuccessor(GetSuccessorContext context) override;
     kj::Promise<void> getPredecessor(GetPredecessorContext context) override;
-    kj::Promise<void> inRange(InRangeContext context) override;
     kj::Promise<void> getIdentifier(GetIdentifierContext context) override;
 private:
     void stabilize();
