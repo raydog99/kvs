@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 14)
 set(CHORD_SRC
     server.h
     server.cpp
+    stabilize.h
+    stabilize.cpp
     fingerTable.h
     fingerTable.cpp
 )

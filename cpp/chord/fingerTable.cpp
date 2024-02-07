@@ -25,5 +25,9 @@ Interval FingerTable::getInterval(int idx){
 }
 
 ChordNode::Client FingerTable::getSuccessor(){
-	return this->nodes[1];
+	return this->successor;
+}
+
+ChordNode::Client FingerTable::setSuccessor(FingerEntry successor){
+	this->successor = successor;
 }
