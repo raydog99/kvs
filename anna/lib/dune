@@ -1,10 +1,2 @@
-(executable
- (name location_service)
- (libraries lwt.unix capnp-rpc-lwt logs.fmt capnp-rpc-unix)
- (flags (:standard -w -53-55))
-)
-
-(rule
- (targets chord_api.ml chord_api.mli)
- (deps    chord_api.capnp)
- (action (run capnp compile -o %{bin:capnpc-ocaml} %{deps})))
+(library
+ (name anna))

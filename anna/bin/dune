@@ -1,4 +1,4 @@
 (executable
- (public_name ocaml_chord)
+ (public_name anna)
  (name main)
- (libraries ocaml_chord))
+ (libraries anna))
