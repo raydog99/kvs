@@ -1,0 +1,4 @@
+(executable
+ (public_name ocaml_chord)
+ (name main)
+ (libraries ocaml_chord))

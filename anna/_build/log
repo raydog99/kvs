@@ -1,0 +1,125 @@
+# dune build
+# OCAMLPARAM: unset
+# Shared cache: disabled
+# Workspace root: /Users/raymonddeng/Desktop/github/dht/ocaml
+# Auto-detected concurrency: 8
+$ /Users/raymonddeng/.opam/default/bin/ocamlc.opt -config > /var/folders/67/5lrzqvrn4711qw5_d4gh04t80000gn/T/dune_c37d9a_output
+# Dune context:
+#  { name = "default"
+#  ; kind = "default"
+#  ; profile = Dev
+#  ; merlin = true
+#  ; for_host = None
+#  ; fdo_target_exe = None
+#  ; build_dir = In_build_dir "default"
+#  ; toplevel_path =
+#      Some External "/Users/raymonddeng/.opam/default/lib/toplevel"
+#  ; ocaml_bin = External "/Users/raymonddeng/.opam/default/bin"
+#  ; ocaml = Ok External "/Users/raymonddeng/.opam/default/bin/ocaml"
+#  ; ocamlc = External "/Users/raymonddeng/.opam/default/bin/ocamlc.opt"
+#  ; ocamlopt = Ok External "/Users/raymonddeng/.opam/default/bin/ocamlopt.opt"
+#  ; ocamldep = Ok External "/Users/raymonddeng/.opam/default/bin/ocamldep.opt"
+#  ; ocamlmklib =
+#      Ok External "/Users/raymonddeng/.opam/default/bin/ocamlmklib.opt"
+#  ; env =
+#      map
+#        { "DUNE_OCAML_HARDCODED" :
+#            "/Users/raymonddeng/.opam/default/lib/ocaml:/Users/raymonddeng/.opam/default/lib"
+#        ; "DUNE_OCAML_STDLIB" : "/Users/raymonddeng/.opam/default/lib/ocaml"
+#        ; "DUNE_SOURCEROOT" : "/Users/raymonddeng/Desktop/github/dht/ocaml"
+#        ; "INSIDE_DUNE" :
+#            "/Users/raymonddeng/Desktop/github/dht/ocaml/_build/default"
+#        ; "OCAMLFIND_IGNORE_DUPS_IN" :
+#            "/Users/raymonddeng/Desktop/github/dht/ocaml/_build/install/default/lib"
+#        ; "OCAMLPATH" :
+#            "/Users/raymonddeng/Desktop/github/dht/ocaml/_build/install/default/lib"
+#        ; "OCAMLTOP_INCLUDE_PATH" :
+#            "/Users/raymonddeng/Desktop/github/dht/ocaml/_build/install/default/lib/toplevel"
+#        ; "OCAML_COLOR" : "always"
+#        ; "OPAMCOLOR" : "always"
+#        }
+#  ; findlib_paths =
+#      [ External "/Users/raymonddeng/.opam/default/lib/ocaml"
+#      ; External "/Users/raymonddeng/.opam/default/lib"
+#      ]
+#  ; arch_sixtyfour = true
+#  ; natdynlink_supported = true
+#  ; supports_shared_libraries = true
+#  ; ocaml_config =
+#      { version = "5.0.0"
+#      ; standard_library_default =
+#          "/Users/raymonddeng/.opam/default/lib/ocaml"
+#      ; standard_library = "/Users/raymonddeng/.opam/default/lib/ocaml"
+#      ; standard_runtime = "the_standard_runtime_variable_was_deleted"
+#      ; ccomp_type = "cc"
+#      ; c_compiler = "cc"
+#      ; ocamlc_cflags =
+#          [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-pthread" ]
+#      ; ocamlc_cppflags = [ "-D_FILE_OFFSET_BITS=64" ]
+#      ; ocamlopt_cflags =
+#          [ "-O2"; "-fno-strict-aliasing"; "-fwrapv"; "-pthread" ]
+#      ; ocamlopt_cppflags = [ "-D_FILE_OFFSET_BITS=64" ]
+#      ; bytecomp_c_compiler =
+#          [ "cc"
+#          ; "-O2"
+#          ; "-fno-strict-aliasing"
+#          ; "-fwrapv"
+#          ; "-pthread"
+#          ; "-D_FILE_OFFSET_BITS=64"
+#          ]
+#      ; bytecomp_c_libraries = [ "-lm"; "-lpthread" ]
+#      ; native_c_compiler =
+#          [ "cc"
+#          ; "-O2"
+#          ; "-fno-strict-aliasing"
+#          ; "-fwrapv"
+#          ; "-pthread"
+#          ; "-D_FILE_OFFSET_BITS=64"
+#          ]
+#      ; native_c_libraries = [ "-lm"; "-lpthread" ]
+#      ; native_pack_linker = [ "ld"; "-r"; "-o" ]
+#      ; cc_profile = []
+#      ; architecture = "arm64"
+#      ; model = "default"
+#      ; int_size = 63
+#      ; word_size = 64
+#      ; system = "macosx"
+#      ; asm = [ "cc"; "-c"; "-Wno-trigraphs" ]
+#      ; asm_cfi_supported = true
+#      ; with_frame_pointers = false
+#      ; ext_exe = ""
+#      ; ext_obj = ".o"
+#      ; ext_asm = ".s"
+#      ; ext_lib = ".a"
+#      ; ext_dll = ".so"
+#      ; os_type = "Unix"
+#      ; default_executable_name = "a.out"
+#      ; systhread_supported = true
+#      ; host = "aarch64-apple-darwin20.3.0"
+#      ; target = "aarch64-apple-darwin20.3.0"
+#      ; profiling = false
+#      ; flambda = false
+#      ; spacetime = false
+#      ; safe_string = true
+#      ; exec_magic_number = "Caml1999X032"
+#      ; cmi_magic_number = "Caml1999I032"
+#      ; cmo_magic_number = "Caml1999O032"
+#      ; cma_magic_number = "Caml1999A032"
+#      ; cmx_magic_number = "Caml1999Y032"
+#      ; cmxa_magic_number = "Caml1999Z032"
+#      ; ast_impl_magic_number = "Caml1999M032"
+#      ; ast_intf_magic_number = "Caml1999N032"
+#      ; cmxs_magic_number = "Caml1999D032"
+#      ; cmt_magic_number = "Caml1999T032"
+#      ; natdynlink_supported = true
+#      ; supports_shared_libraries = true
+#      ; windows_unicode = false
+#      }
+#  }
+$ (cd _build/default && /Users/raymonddeng/.opam/default/bin/ocamldep.opt -modules -impl lib/chord.ml) > _build/default/lib/.location_service.eobjs/dune__exe__Chord.impl.d
+$ (cd _build/default && /Users/raymonddeng/.opam/default/bin/ocamlc.opt -w @1..3@5..28@30..39@43@46..47@49..57@61..62@67@69-40 -strict-sequence -strict-formats -short-paths -keep-locs -w -53-55 -g -bin-annot -I lib/.location_service.eobjs/byte -I /Users/raymonddeng/.opam/default/lib/angstrom -I /Users/raymonddeng/.opam/default/lib/asetmap -I /Users/raymonddeng/.opam/default/lib/asn1-combinators -I /Users/raymonddeng/.opam/default/lib/astring -I /Users/raymonddeng/.opam/default/lib/base64 -I /Users/raymonddeng/.opam/default/lib/bigstringaf -I /Users/raymonddeng/.opam/default/lib/bytes -I /Users/raymonddeng/.opam/default/lib/capnp -I /Users/raymonddeng/.opam/default/lib/capnp-rpc -I /Users/raymonddeng/.opam/default/lib/capnp-rpc-lwt -I /Users/raymonddeng/.opam/default/lib/capnp-rpc-net -I /Users/raymonddeng/.opam/default/lib/capnp-rpc-unix -I /Users/raymonddeng/.opam/default/lib/cmdliner -I /Users/raymonddeng/.opam/default/lib/cstruct -I /Users/raymonddeng/.opam/default/lib/cstruct-lwt -I /Users/raymonddeng/.opam/default/lib/domain-name -I /Users/raymonddeng/.opam/default/lib/duration -I /Users/raymonddeng/.opam/default/lib/eqaf -I /Users/raymonddeng/.opam/default/lib/eqaf/bigstring -I /Users/raymonddeng/.opam/default/lib/eqaf/cstruct -I /Users/raymonddeng/.opam/default/lib/extunix -I /Users/raymonddeng/.opam/default/lib/fmt -I /Users/raymonddeng/.opam/default/lib/gmap -I /Users/raymonddeng/.opam/default/lib/hkdf -I /Users/raymonddeng/.opam/default/lib/ipaddr -I /Users/raymonddeng/.opam/default/lib/logs -I /Users/raymonddeng/.opam/default/lib/lwt -I /Users/raymonddeng/.opam/default/lib/lwt/unix -I /Users/raymonddeng/.opam/default/lib/macaddr -I /Users/raymonddeng/.opam/default/lib/mirage-clock -I /Users/raymonddeng/.opam/default/lib/mirage-crypto -I /Users/raymonddeng/.opam/default/lib/mirage-crypto-ec -I /Users/raymonddeng/.opam/default/lib/mirage-crypto-pk -I /Users/raymonddeng/.opam/default/lib/mirage-crypto-rng -I /Users/raymonddeng/.opam/default/lib/mirage-crypto-rng-lwt -I /Users/raymonddeng/.opam/default/lib/mirage-crypto-rng/unix -I /Users/raymonddeng/.opam/default/lib/mirage-flow -I /Users/raymonddeng/.opam/default/lib/mirage-kv -I /Users/raymonddeng/.opam/default/lib/mtime -I /Users/raymonddeng/.opam/default/lib/mtime/clock/os -I /Users/raymonddeng/.opam/default/lib/ocaml/threads -I /Users/raymonddeng/.opam/default/lib/ocaml/unix -I /Users/raymonddeng/.opam/default/lib/ocplib-endian -I /Users/raymonddeng/.opam/default/lib/ocplib-endian/bigstring -I /Users/raymonddeng/.opam/default/lib/optint -I /Users/raymonddeng/.opam/default/lib/pbkdf -I /Users/raymonddeng/.opam/default/lib/prometheus -I /Users/raymonddeng/.opam/default/lib/ptime -I /Users/raymonddeng/.opam/default/lib/re -I /Users/raymonddeng/.opam/default/lib/res -I /Users/raymonddeng/.opam/default/lib/result -I /Users/raymonddeng/.opam/default/lib/seq -I /Users/raymonddeng/.opam/default/lib/sexplib0 -I /Users/raymonddeng/.opam/default/lib/stdint -I /Users/raymonddeng/.opam/default/lib/stringext -I /Users/raymonddeng/.opam/default/lib/tls -I /Users/raymonddeng/.opam/default/lib/tls-mirage -I /Users/raymonddeng/.opam/default/lib/uri -I /Users/raymonddeng/.opam/default/lib/x509 -I /Users/raymonddeng/.opam/default/lib/zarith -no-alias-deps -opaque -open Dune__exe -o lib/.location_service.eobjs/byte/dune__exe__Chord.cmo -c -impl lib/chord.ml)
+> File "lib/chord.ml", line 16, characters 40-51:
+> 16 |       Results.reply_set_builder results ChordNode.t;
+>                                              ^^^^^^^^^^^
+> Error: Unbound module ChordNode
+[2]
