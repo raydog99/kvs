@@ -1,0 +1,9 @@
+(executable
+ (name anna)
+ (modules anna)
+ (libraries unix threads glpk kvs))
+
+(library
+ (name kvs)
+ (modules kv_store metadata prediction_model lopt_solver strategies ycsb)
+ (libraries unix threads glpk))
